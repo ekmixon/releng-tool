@@ -96,11 +96,9 @@ def load(hash_file):
 
         entry_len = len(entry)
         if entry_len > 3:
-            raise BadFormatHashLoadError(
-                'too many values for entry {}'.format(idx + 1))
+            raise BadFormatHashLoadError(f'too many values for entry {idx + 1}')
         if entry_len < 3:
-            raise BadFormatHashLoadError(
-                'too few values for entry {}'.format(idx + 1))
+            raise BadFormatHashLoadError(f'too few values for entry {idx + 1}')
 
     # compile a list of tuples with no empty entries
     return [tuple(x) for x in data if x]
@@ -204,15 +202,13 @@ library.
         target_file = os.path.join(path, asset)
         try:
             with open(target_file, 'rb') as f:
-                buf = f.read(HASH_READ_BLOCKSIZE)
-                while buf:
+                while buf := f.read(HASH_READ_BLOCKSIZE):
                     for hasher in hashers.values():
                         hasher.update(buf)
-                    buf = f.read(HASH_READ_BLOCKSIZE)
         except IOError:
             if not quiet:
                 if relaxed:
-                    warn('missing expected file for verification: ' + asset)
+                    warn(f'missing expected file for verification: {asset}')
                 else:
                     err('missing expected file for verification')
                     err("""\
@@ -224,18 +220,15 @@ Ensure the hash file correctly names an expected file.
             return HashResult.MISSING_LISTED
 
         for hash_type, hasher in hashers.items():
-            debug('calculated-hash: {} {}:{}'.format(asset, hash_type, hash))
+            debug(f'calculated-hash: {asset} {hash_type}:{hash}')
             digest = hasher.hexdigest()
             hashes = type_hashes[hash_type]
             if digest not in hashes:
                 if not quiet:
                     if relaxed:
-                        warn('hash mismatch detected: ' + asset)
+                        warn(f'hash mismatch detected: {asset}')
                     else:
-                        provided = ''
-                        for hash_ in hashes:
-                            provided += '\n     Provided: {}'.format(hash_)
-
+                        provided = ''.join(f'\n     Provided: {hash_}' for hash_ in hashes)
                         err("""hash mismatch detected\
 
     Hash File: {}
@@ -260,7 +253,4 @@ def _get_hasher(type_):
         the hasher instance; ``None`` if the hash type is not supported
     """
     type_ = type_.lower()
-    func = getattr(hashlib, type_, None)
-    if func:
-        return func()
-    return None
+    return func() if (func := getattr(hashlib, type_, None)) else None

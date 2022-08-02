@@ -18,13 +18,7 @@ class TestUtilCommon(unittest.TestCase):
         self.assertEqual(value, 'test4')
 
         # sanity check against False evaluated types
-        checks = [
-            '',
-            0,
-            dict(),
-            list(),
-            set(),
-        ]
+        checks = ['', 0, {}, [], set()]
         for check in checks:
             value = nullish_coalescing(check, 'err')
             self.assertEqual(value, check)

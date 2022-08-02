@@ -41,14 +41,14 @@ def stage(engine, pkg, ignore_cache):
     """
     assert pkg.vcs_type
     name = pkg.name
-    debug('process fetch stage: ' + name)
+    debug(f'process fetch stage: {name}')
 
     # local sources mode requires internal sources to be already checked out
     if pkg.is_internal and engine.opts.local_srcs:
         if os.path.isdir(pkg.build_dir):
             return True
 
-        err('missing local sources for internal package: ' + name)
+        err(f'missing local sources for internal package: {name}')
         err("""\
 The active configuration is flagged for 'local sources' mode; however, an
 internal package cannot be found in the local system. Before continuing, ensure
@@ -77,8 +77,7 @@ local sources option to use the default process).
 
     cache_filename = os.path.basename(pkg.cache_file)
     out_dir = engine.opts.out_dir
-    with generate_temp_dir(out_dir) as work_dir, \
-            generate_temp_dir(out_dir) as interim_cache_dir:
+    with generate_temp_dir(out_dir) as work_dir, generate_temp_dir(out_dir) as interim_cache_dir:
         with interim_working_dir(work_dir):
             interim_cache_file = os.path.join(interim_cache_dir, cache_filename)
             fetch_opts.cache_file = interim_cache_file
@@ -99,7 +98,7 @@ local sources option to use the default process).
                 fetch_opts.ignore_cache = True
 
                 if os.path.exists(pkg.cache_file):
-                    verbose('removing cache file (per configuration): ' + name)
+                    verbose(f'removing cache file (per configuration): {name}')
                     if not path_remove(pkg.cache_file):
                         return False
 
@@ -113,11 +112,11 @@ local sources option to use the default process).
                         rv = True
                     elif hr == HashResult.BAD_PATH:
                         if not pkg.is_internal:
-                            warn('missing hash file for package: ' + name)
+                            warn(f'missing hash file for package: {name}')
                         rv = True # no hash file to compare with; assuming ok
                     elif hr == HashResult.EMPTY:
                         if not pkg.is_internal:
-                            warn('hash file for package is empty: ' + name)
+                            warn(f'hash file for package is empty: {name}')
                         rv = True # empty hash file; assuming ok
                     elif hr == HashResult.MISMATCH:
                         if not path_remove(pkg.cache_file):
@@ -193,8 +192,6 @@ verified. Ensure the hash file defines an entry for the expected cache file:
             # directly, we are done
             if fetched == pkg.cache_dir:
                 pass
-            # if the fetch type has returned a file, the file needs to be hash
-            # checked and then be moved into the download cache
             elif fetched == interim_cache_file:
                 if perform_file_hash_check:
                     hr = verify_hashes(pkg.hash_file, fetched)
@@ -202,10 +199,10 @@ verified. Ensure the hash file defines an entry for the expected cache file:
                         pass
                     elif hr == HashResult.BAD_PATH:
                         if not pkg.is_internal:
-                            warn('missing hash file for package: ' + name)
+                            warn(f'missing hash file for package: {name}')
                     elif hr == HashResult.EMPTY:
                         if not pkg.is_internal:
-                            warn('hash file for package is empty: ' + name)
+                            warn(f'hash file for package is empty: {name}')
                     elif hr == HashResult.MISMATCH:
                         return False
                     elif hr in (HashResult.BAD_FORMAT, HashResult.UNSUPPORTED):

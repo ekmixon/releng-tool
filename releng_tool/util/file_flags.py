@@ -74,12 +74,11 @@ def process_file_flag(flag, file):
         # existence of the file flag to still be considered as configured.
         if touch(file):
             rv = FileFlag.CONFIGURED
+        elif os.path.isfile(file):
+            rv = FileFlag.CONFIGURED
         else:
-            if os.path.isfile(file):
-                rv = FileFlag.CONFIGURED
-            else:
-                rv = FileFlag.NOT_CONFIGURED
-                err('unable to configure file flag: {}'.format(file))
+            rv = FileFlag.NOT_CONFIGURED
+            err(f'unable to configure file flag: {file}')
     elif flag is None and os.path.isfile(file):
         rv = FileFlag.EXISTS
     else:

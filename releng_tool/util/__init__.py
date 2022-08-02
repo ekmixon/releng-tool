@@ -15,7 +15,4 @@ def nullish_coalescing(value, default):
     Returns:
         the provided value if not ``None``; otherwise, the default value
     """
-    if value is None:
-        return default
-
-    return value
+    return default if value is None else value

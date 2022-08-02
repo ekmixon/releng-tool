@@ -18,4 +18,4 @@ def replicate_package_attribs(opts, pkg):
     """
     for key, value in pkg.__dict__.items():
         if not key.startswith('_'):
-            opts.__dict__['_' + key] = deepcopy(value)
+            opts.__dict__[f'_{key}'] = deepcopy(value)

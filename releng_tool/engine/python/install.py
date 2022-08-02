@@ -39,7 +39,7 @@ def install(opts):
         '--prefix': opts.prefix,
     }
     if opts.install_defs:
-        python_defs.update(expand(opts.install_defs))
+        python_defs |= expand(opts.install_defs)
 
     # always remove the prefix value if:
     #  - *nix: setup.py may ignore provided `--root` value with an "/" prefix
@@ -51,7 +51,7 @@ def install(opts):
     python_opts = {
     }
     if opts.install_opts:
-        python_opts.update(expand(opts.install_opts))
+        python_opts |= expand(opts.install_opts)
 
     # argument building
     python_args = [

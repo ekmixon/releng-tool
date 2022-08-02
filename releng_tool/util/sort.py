@@ -47,9 +47,7 @@ class TopologicalSorter:
             all sorting calls (if multiple sort operations a desired) are
             completed.
         """
-        if self._visit(obj):
-            return self.sorted
-        return None
+        return self.sorted if self._visit(obj) else None
 
     def reset(self):
         """

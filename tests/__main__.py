@@ -53,12 +53,9 @@ def main():
     tests_dir = os.path.join(test_base, 'unit-tests')
     unit_tests = loader.discover(tests_dir)
 
-    # check if a unit test name was provided
-    target_test_name_pattern = None
-    for arg in sys.argv[1:]:
-        if not arg.startswith('-'):
-            target_test_name_pattern = arg
-            break
+    target_test_name_pattern = next(
+        (arg for arg in sys.argv[1:] if not arg.startswith('-')), None
+    )
 
     # register tests
     target_unit_tests = None
@@ -68,11 +65,10 @@ def main():
         if target_unit_tests:
             print('running specific tests:')
             for test in target_unit_tests:
-                print('    {}'.format(test.id()))
+                print(f'    {test.id()}')
             sys.stdout.flush()
         else:
-            print('ERROR: unable to find test with pattern: '
-                '{}'.format(target_test_name_pattern))
+            print(f'ERROR: unable to find test with pattern: {target_test_name_pattern}')
             if not module_load_failure:
                 sys.exit(1)
 
@@ -104,7 +100,7 @@ def find_tests(entity, pattern):
     module_load_failure = False
 
     if isinstance(entity, unittest.case.TestCase):
-        if fnmatch.fnmatch(entity.id(), '*{}*'.format(pattern)):
+        if fnmatch.fnmatch(entity.id(), f'*{pattern}*'):
             found.append(entity)
         elif 'ModuleImportFailure' in entity.id():
             module_load_failure = True

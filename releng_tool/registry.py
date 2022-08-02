@@ -86,26 +86,24 @@ class RelengRegistry(RelengRegistryInterface):
             return True
 
         loaded = False
-        debug('attempting to load extension: {}'.format(name))
+        debug(f'attempting to load extension: {name}')
         try:
             plugin = import_module(name)
             if hasattr(plugin, 'releng_setup'):
                 try:
                     plugin.releng_setup(self)
                     self.extension.append(name)
-                    verbose('loaded extension: {}'.format(name))
+                    verbose(f'loaded extension: {name}')
                     loaded = True
                 except RelengInvalidSetupException as e:
-                    warn('extension is not supported due to an invalid setup: '
-                        '{}'.format(name))
-                    warn(' ({})'.format(e))
+                    warn(f'extension is not supported due to an invalid setup: {name}')
+                    warn(f' ({e})')
                 except RelengVersionNotSupportedException:
-                    warn('extension is not supported with this '
-                        'version: {}'.format(name))
+                    warn(f'extension is not supported with this version: {name}')
             else:
-                warn('extension does not have a setup method: {}'.format(name))
+                warn(f'extension does not have a setup method: {name}')
         except ModuleNotFoundError:
-            warn('unable to find extension: {}'.format(name))
+            warn(f'unable to find extension: {name}')
 
         return loaded
 
@@ -150,11 +148,15 @@ class RelengRegistry(RelengRegistryInterface):
             raise RelengInvalidSetupException('invalid extract name provided')
         name_uc = name.upper()
         if not name_uc.startswith(PREFIX_REQUIREMENT.upper()):
-            raise RelengInvalidSetupException('extension-defined extract types '
-                'must be prefixed with "{}"'.format(PREFIX_REQUIREMENT))
+            raise RelengInvalidSetupException(
+                f'extension-defined extract types must be prefixed with "{PREFIX_REQUIREMENT}"'
+            )
+
         if name_uc in self.extract_types:
-            raise RelengInvalidSetupException('extension extract type {} is '
-                'already defined by another extension'.format(name))
+            raise RelengInvalidSetupException(
+                f'extension extract type {name} is already defined by another extension'
+            )
+
         extract_type = handler()
         extract_op = getattr(extract_type, 'extract', None)
         if not callable(extract_op):
@@ -201,11 +203,15 @@ class RelengRegistry(RelengRegistryInterface):
             raise RelengInvalidSetupException('invalid fetch name provided')
         name_uc = name.upper()
         if not name_uc.startswith(PREFIX_REQUIREMENT.upper()):
-            raise RelengInvalidSetupException('extension-defined fetch types '
-                'must be prefixed with "{}"'.format(PREFIX_REQUIREMENT))
+            raise RelengInvalidSetupException(
+                f'extension-defined fetch types must be prefixed with "{PREFIX_REQUIREMENT}"'
+            )
+
         if name_uc in self.fetch_types:
-            raise RelengInvalidSetupException('extension fetch type {} is '
-                'already defined by another extension'.format(name))
+            raise RelengInvalidSetupException(
+                f'extension fetch type {name} is already defined by another extension'
+            )
+
         fetch_type = handler()
         fetch_op = getattr(fetch_type, 'fetch', None)
         if not callable(fetch_op):
@@ -253,11 +259,15 @@ class RelengRegistry(RelengRegistryInterface):
             raise RelengInvalidSetupException('invalid package name provided')
         name_uc = name.upper()
         if not name_uc.startswith(PREFIX_REQUIREMENT.upper()):
-            raise RelengInvalidSetupException('extension-defined package types '
-                'must be prefixed with "{}"'.format(PREFIX_REQUIREMENT))
+            raise RelengInvalidSetupException(
+                f'extension-defined package types must be prefixed with "{PREFIX_REQUIREMENT}"'
+            )
+
         if name_uc in self.package_types:
-            raise RelengInvalidSetupException('extension package type {} '
-                'is already defined by another extension'.format(name))
+            raise RelengInvalidSetupException(
+                f'extension package type {name} is already defined by another extension'
+            )
+
         package_type = handler()
         build_op = getattr(package_type, 'build', None)
         configure_op = getattr(package_type, 'configure', None)
@@ -293,4 +303,5 @@ class RelengRegistry(RelengRegistryInterface):
             current = releng_version.split('.')
             if requested > current:
                 raise RelengVersionNotSupportedException(
-                    'requires {}, has {}'.format(version, releng_version))
+                    f'requires {version}, has {releng_version}'
+                )

@@ -33,11 +33,7 @@ def stage(engine, pkg, script_env):
     note('building {}...'.format(pkg.name))
     sys.stdout.flush()
 
-    if pkg.build_subdir:
-        build_dir = pkg.build_subdir
-    else:
-        build_dir = pkg.build_dir
-
+    build_dir = pkg.build_subdir or pkg.build_dir
     build_opts = RelengBuildOptions()
     replicate_package_attribs(build_opts, pkg)
     build_opts.build_defs = pkg.build_defs

@@ -39,13 +39,13 @@ def compare_contents(first, second):
         with open(first, mode='r', encoding='utf_8') as file:
             content1 = strip_lines(file.readlines())
     except IOError:
-        return 'failed to load first file: ' + first
+        return f'failed to load first file: {first}'
 
     try:
         with open(second, mode='r', encoding='utf_8') as file:
             content2 = strip_lines(file.readlines())
     except IOError:
-        return 'failed to load second file: ' + second
+        return f'failed to load second file: {second}'
 
     diff = unified_diff(content1, content2,
         fromfile=first, tofile=second, lineterm='\n')
@@ -106,9 +106,7 @@ def prepare_testenv(config=None, template=None, args=None):
 
         # prepare engine options and build an engine instance
         opts = RelengEngineOptions(args=test_args, forward_args=args)
-        engine = RelengEngine(opts)
-
-        yield engine
+        yield RelengEngine(opts)
 
 @contextmanager
 def prepare_workdir():

@@ -34,11 +34,7 @@ def stage(engine, pkg, script_env):
     note('installing {}...'.format(pkg.name))
     sys.stdout.flush()
 
-    if pkg.build_subdir:
-        build_dir = pkg.build_subdir
-    else:
-        build_dir = pkg.build_dir
-
+    build_dir = pkg.build_subdir or pkg.build_dir
     pkg_install_type = NC(pkg.install_type, PackageInstallType.TARGET)
 
     if pkg_install_type == PackageInstallType.HOST:

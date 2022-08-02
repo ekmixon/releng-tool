@@ -29,13 +29,13 @@ def build(opts):
     autotools_defs = {
     }
     if opts.build_defs:
-        autotools_defs.update(expand(opts.build_defs))
+        autotools_defs |= expand(opts.build_defs)
 
     # default options
     autotools_opts = {
     }
     if opts.build_opts:
-        autotools_opts.update(expand(opts.build_opts))
+        autotools_opts |= expand(opts.build_opts)
 
     # argument building
     autotools_args = [
@@ -44,9 +44,7 @@ def build(opts):
     autotools_args.extend(prepare_arguments(autotools_opts))
 
     if opts.jobs > 1:
-        autotools_args.append('--jobs')
-        autotools_args.append(str(opts.jobs))
-
+        autotools_args.extend(('--jobs', str(opts.jobs)))
     if not MAKE.execute(autotools_args, env=expand(opts.build_env)):
         err('failed to build autotools project: {}', opts.name)
         return False

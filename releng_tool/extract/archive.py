@@ -64,21 +64,21 @@ def extract(opts):
                 err(' (command: {})'.format(tool_cmd))
                 return None
 
-        # attempt to extract the (compressed) tar archive with the host's
-        # tar tool; if it does not exist, we'll fallback to using python's
-        # internal implementation (tarfile)
         elif cache_ext.startswith(TAR_SUPPORTED):
             is_extractable = True
 
             has_extracted = False
             if TAR.exists():
-                if TAR.execute([
+                if TAR.execute(
+                    [
                         '--extract',
-                        '--file=' + cache_file,
+                        f'--file={cache_file}',
                         '--force-local',
                         '--strip-components={}'.format(strip_count),
-                        '--verbose'],
-                        cwd=work_dir):
+                        '--verbose',
+                    ],
+                    cwd=work_dir,
+                ):
                     has_extracted = True
                 else:
                     warn('unable to extract archive with host tar; '
@@ -110,8 +110,6 @@ def extract(opts):
                     err(' (target: {})'.format(work_dir))
                     return False
 
-        # extract a zip-extension cache file using python's internal
-        # implementation (zipfile)
         elif cache_ext == 'zip':
             is_extractable = True
 
@@ -144,7 +142,7 @@ def extract(opts):
                 return False
 
     if not is_extractable:
-        debug('file not considered extractable: ' + cache_file)
+        debug(f'file not considered extractable: {cache_file}')
         try:
             shutil.copy2(cache_file, work_dir)
         except IOError as e:

@@ -29,23 +29,19 @@ def stage(engine, pkg, script_env):
         ``True`` if the bootstrapping stage is completed; ``False`` otherwise
     """
 
-    verbose('bootstrapping {}...'.format(pkg.name))
+    verbose(f'bootstrapping {pkg.name}...')
     sys.stdout.flush()
 
-    bootstrap_script_filename = '{}-{}'.format(pkg.name, BOOTSTRAP_SCRIPT)
+    bootstrap_script_filename = f'{pkg.name}-{BOOTSTRAP_SCRIPT}'
     bootstrap_script = os.path.join(pkg.def_dir, bootstrap_script_filename)
     bootstrap_script, bootstrap_script_exists = opt_file(bootstrap_script)
     if not bootstrap_script_exists:
         return True
 
-    if pkg.build_subdir:
-        build_dir = pkg.build_subdir
-    else:
-        build_dir = pkg.build_dir
-
+    build_dir = pkg.build_subdir or pkg.build_dir
     with interim_working_dir(build_dir):
         if not run_script(bootstrap_script, script_env, subject='bootstrap'):
             return False
 
-    verbose('bootstrap script executed: ' + bootstrap_script)
+    verbose(f'bootstrap script executed: {bootstrap_script}')
     return True

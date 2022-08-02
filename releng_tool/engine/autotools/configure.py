@@ -41,13 +41,13 @@ def configure(opts):
         '--exec-prefix': opts.prefix,
     }
     if opts.conf_defs:
-        autotools_defs.update(expand(opts.conf_defs))
+        autotools_defs |= expand(opts.conf_defs)
 
     # default options
     autotools_opts = {
     }
     if opts.conf_opts:
-        autotools_opts.update(expand(opts.conf_opts))
+        autotools_opts |= expand(opts.conf_opts)
 
     # argument building
     autotools_args = [

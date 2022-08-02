@@ -138,22 +138,19 @@ class RelengPrerequisites:
         # project-provided tools check
         for tool in self.tools:
             if distutils.spawn.find_executable(tool):
-                verbose('prerequisite exists: ' + tool)
+                verbose(f'prerequisite exists: {tool}')
             else:
                 missing.add(tool)
 
         if missing and not quiet:
-            sorted_missing = list(missing)
-            sorted_missing.sort()
-
-            msg = 'missing the following host tools for this project:'
-            msg += '\n'
+            sorted_missing = sorted(missing)
+            msg = 'missing the following host tools for this project:' + '\n'
             msg += '\n'
             for entry in sorted_missing:
-                msg += ' ' + entry + '\n'
+                msg += f' {entry}' + '\n'
             err(msg)
 
-        return len(missing) == 0
+        return not missing
 
     def _verbose_exists(self, tool):
         """
@@ -165,4 +162,4 @@ class RelengPrerequisites:
         Args:
             tool: the tool
         """
-        verbose('prerequisite exists: ' + tool.tool)
+        verbose(f'prerequisite exists: {tool.tool}')

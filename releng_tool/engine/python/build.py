@@ -38,13 +38,13 @@ def build(opts):
     python_defs = {
     }
     if opts.build_defs:
-        python_defs.update(expand(opts.build_defs))
+        python_defs |= expand(opts.build_defs)
 
     # default options
     python_opts = {
     }
     if opts.build_opts:
-        python_opts.update(expand(opts.build_opts))
+        python_opts |= expand(opts.build_opts)
 
     # default environment
     python_path1 = python_tool.path(sysroot=opts.staging_dir, prefix=opts.prefix)
@@ -55,7 +55,7 @@ def build(opts):
 
     # apply package-specific environment options
     if opts.build_env:
-        env.update(expand(opts.build_env))
+        env |= expand(opts.build_env)
 
     # argument building
     python_args = [

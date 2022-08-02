@@ -29,8 +29,8 @@ def extract(opts):
         err('unable to extract package; git is not installed')
         return None
 
-    git_dir = '--git-dir=' + cache_dir
-    work_tree = '--work-tree=' + work_dir
+    git_dir = f'--git-dir={cache_dir}'
+    work_tree = f'--work-tree={work_dir}'
 
     log('checking out target revision into work tree')
     if not GIT.execute([git_dir, work_tree, '-c', 'advice.detachedHead=false',

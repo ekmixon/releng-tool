@@ -41,11 +41,14 @@ def configure(opts):
             join(opts.staging_dir + prefix, 'include') + ';' +
             join(opts.target_dir + prefix, 'include'))
         library_loc = (
-            join(opts.staging_dir + prefix, DEFAULT_LIB_DIR) + ';' +
-            join(opts.target_dir + prefix, DEFAULT_LIB_DIR))
-        prefix_loc = (
-            join(opts.staging_dir + prefix) + ';' +
-            join(opts.target_dir + prefix))
+            f'{join(opts.staging_dir + prefix, DEFAULT_LIB_DIR)};'
+            + join(opts.target_dir + prefix, DEFAULT_LIB_DIR)
+        )
+
+        prefix_loc = f'{join(opts.staging_dir + prefix)};' + join(
+            opts.target_dir + prefix
+        )
+
 
     # definitions
     cmake_defs = {
@@ -64,13 +67,13 @@ def configure(opts):
         'CMAKE_INSTALL_LIBDIR': join(prefix, DEFAULT_LIB_DIR),
     }
     if opts.conf_defs:
-        cmake_defs.update(expand(opts.conf_defs))
+        cmake_defs |= expand(opts.conf_defs)
 
     # options
     cmake_opts = {
     }
     if opts.conf_opts:
-        cmake_opts.update(expand(opts.conf_opts))
+        cmake_opts |= expand(opts.conf_opts)
 
     # argument building
     cmake_args = [

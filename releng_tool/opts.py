@@ -28,7 +28,7 @@ FF_DEVMODE_NAME = 'devmode' #: postfix for development mode file flag
 FF_LOCALSRCS_NAME = 'local-sources' #: postfix for local sources mode file flag
 
 # default other
-DEFAULT_SYSROOT_PREFIX = os.sep + 'usr' #: default system root prefix
+DEFAULT_SYSROOT_PREFIX = f'{os.sep}usr'
 
 class RelengEngineOptions:
     """
@@ -165,7 +165,7 @@ class RelengEngineOptions:
                 self.gbl_action = GlobalAction[action_val]
             else:
                 for subaction_val in PkgAction.__members__:
-                    if action_val.endswith('_' + subaction_val):
+                    if action_val.endswith(f'_{subaction_val}'):
                         self.pkg_action = PkgAction[subaction_val]
                         idx = action_val.rindex(subaction_val) - 1
                         self.target_action = args.action[:idx]

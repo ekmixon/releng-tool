@@ -51,18 +51,17 @@ def fetch(opts):
         err('unable to fetch package; git is not installed')
         return None
 
-    git_dir = '--git-dir=' + cache_dir
+    git_dir = f'--git-dir={cache_dir}'
 
     # check if we have the target revision; if so, full stop
-    if os.path.isdir(cache_dir) and not opts.ignore_cache:
-        if revision_exists(git_dir, revision) == GitExistsType.EXISTS:
+    if (
+        os.path.isdir(cache_dir)
+        and not opts.ignore_cache
+        and revision_exists(git_dir, revision) == GitExistsType.EXISTS
+    ):
             # ensure configuration is properly synchronized
-            if not sync_git_configuration(git_dir, opts):
-                return None
-
-            return cache_dir
-
-    note('fetching {}...'.format(name))
+        return cache_dir if sync_git_configuration(git_dir, opts) else None
+    note(f'fetching {name}...')
     sys.stdout.flush()
 
     # if we have a cache dir, ensure it's stable
@@ -107,14 +106,12 @@ def fetch(opts):
 
     # allow fetching addition references if configured (e.g. pull requests)
     if opts._git_refspecs:
-        for ref in opts._git_refspecs:
-            fetch_cmd.append(
-                '+refs/{}/*/head:refs/remotes/origin/{}/*'.format(ref, ref))
+        fetch_cmd.extend(
+            f'+refs/{ref}/*/head:refs/remotes/origin/{ref}/*'
+            for ref in opts._git_refspecs
+        )
 
-    # limit fetch depth
-    target_depth = 1
-    if opts._git_depth is not None:
-        target_depth = opts._git_depth
+    target_depth = opts._git_depth if opts._git_depth is not None else 1
     limited_fetch = (target_depth and 'releng.git.no_depth' not in opts._quirks)
 
     if limited_fetch:
@@ -139,12 +136,12 @@ def fetch(opts):
             return None
 
         if revision_exists(git_dir, revision) != GitExistsType.EXISTS:
-            err('unable to find matching revision in repository: ' + name)
-            err(' (revision: {}) '.format(revision))
+            err(f'unable to find matching revision in repository: {name}')
+            err(f' (revision: {revision}) ')
             return None
     else:
-        err('unable to find matching revision in repository: ' + name)
-        err(' (revision: {}) '.format(revision))
+        err(f'unable to find matching revision in repository: {name}')
+        err(f' (revision: {revision}) ')
         return None
 
     return cache_dir
@@ -165,11 +162,16 @@ def revision_exists(git_dir, revision):
     """
 
     output = []
-    if not GIT.execute([git_dir, 'rev-parse', '--quiet', '--verify',
-            revision], quiet=True, capture=output):
-        if not GIT.execute([git_dir, 'rev-parse', '--quiet', '--verify',
-                'origin/' + revision], quiet=True, capture=output):
-            return GitExistsType.MISSING
+    if not GIT.execute(
+        [git_dir, 'rev-parse', '--quiet', '--verify', revision],
+        quiet=True,
+        capture=output,
+    ) and not GIT.execute(
+        [git_dir, 'rev-parse', '--quiet', '--verify', f'origin/{revision}'],
+        quiet=True,
+        capture=output,
+    ):
+        return GitExistsType.MISSING
 
     # confirm a hash-provided revision exists
     #
@@ -178,9 +180,12 @@ def revision_exists(git_dir, revision):
     # To handle this case, check if the revision matches the returned hash
     # valid provided. If so, perform a `cat-file` request to ensure the long
     # hash entry is indeed a valid commit.
-    if output and output[0] == revision:
-        if not GIT.execute([git_dir, 'cat-file', '-t', revision], quiet=True):
-            return GitExistsType.MISSING_HASH
+    if (
+        output
+        and output[0] == revision
+        and not GIT.execute([git_dir, 'cat-file', '-t', revision], quiet=True)
+    ):
+        return GitExistsType.MISSING_HASH
 
     return GitExistsType.EXISTS
 

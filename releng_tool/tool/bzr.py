@@ -18,15 +18,10 @@ BZR_SANITIZE_ENV_KEYS = [
 
 #: dictionary of environment entries append to the environment dictionary
 BZR_EXTEND_ENV = {
-    # always use a progress bar
     'BZR_PROGRESS_BAR': 'text',
+    'BZR_LOG': '/dev/null' if sys.platform != 'win32' else 'NUL',
 }
 
-# always suppress file logging
-if sys.platform != 'win32':
-    BZR_EXTEND_ENV['BZR_LOG'] = '/dev/null'
-else:
-    BZR_EXTEND_ENV['BZR_LOG'] = 'NUL'
 
 #: bzr host tool helper
 BZR = RelengTool(BZR_COMMAND,

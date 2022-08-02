@@ -42,8 +42,10 @@ def main():
         parser.add_argument('--root-dir')
         parser.add_argument('--quirk', action='append')
         parser.add_argument('--verbose', '-V', action='store_true')
-        parser.add_argument('--version', action='version',
-            version='%(prog)s ' + releng_version)
+        parser.add_argument(
+            '--version', action='version', version=f'%(prog)s {releng_version}'
+        )
+
 
         known_args = sys.argv[1:]
         forward_args = []
@@ -63,7 +65,7 @@ def main():
 
         releng_log_configuration(args.debug, args.nocolorout, args.verbose)
 
-        verbose('releng-tool {}'.format(releng_version))
+        verbose(f'releng-tool {releng_version}')
 
         if unknown_args:
             warn('unknown arguments: {}', ' '.join(unknown_args))
@@ -105,8 +107,6 @@ def main():
             err(e)
     except KeyboardInterrupt:
         print('')
-        pass
-
     return retval
 
 def type_nonnegativeint(value):

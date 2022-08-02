@@ -36,12 +36,18 @@ def fetch(opts):
     hg_dir = ['--repository', cache_dir]
 
     # check if we have the target revision; if so, full stop
-    if os.path.isdir(cache_dir) and not opts.ignore_cache:
-        if HG.execute(hg_dir + ['--quiet', 'log', '--rev', revision],
-                cwd=cache_dir, quiet=True):
-            return cache_dir
+    if (
+        os.path.isdir(cache_dir)
+        and not opts.ignore_cache
+        and HG.execute(
+            hg_dir + ['--quiet', 'log', '--rev', revision],
+            cwd=cache_dir,
+            quiet=True,
+        )
+    ):
+        return cache_dir
 
-    note('fetching {}...'.format(name))
+    note(f'fetching {name}...')
     sys.stdout.flush()
 
     # if we have no cache for this repository, build one
@@ -64,8 +70,8 @@ def fetch(opts):
     log('verifying target revision exists')
     if not HG.execute(hg_dir + ['--quiet', 'log', '--rev', revision],
             cwd=cache_dir, quiet=True):
-        err('unable to find matching revision in repository: ' + name)
-        err(' (revision: {}) '.format(revision))
+        err(f'unable to find matching revision in repository: {name}')
+        err(f' (revision: {revision}) ')
         return None
 
     return cache_dir

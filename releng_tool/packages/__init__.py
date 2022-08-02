@@ -52,4 +52,4 @@ def pkg_key(pkg, type_):
     clean = pkg
     for c in [' ', '*', '-', '.', ':', '?', '|']:
         clean = clean.replace(c, '_')
-    return '{}_{}'.format(clean.upper(), type_)
+    return f'{clean.upper()}_{type_}'

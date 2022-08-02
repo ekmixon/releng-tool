@@ -29,8 +29,11 @@ class TestUtilIo(unittest.TestCase):
         cls.assets_dir = os.path.join(base_dir, ASSETS_DIR)
 
         def assertExists(cls, path, *args):
-            cls.assertTrue(path_exists(path, *args),
-                'missing file: ' + os.path.join(path, *args))
+            cls.assertTrue(
+                path_exists(path, *args),
+                f'missing file: {os.path.join(path, *args)}',
+            )
+
         cls.assertExists = assertExists
 
     def test_utilio_copy(self):

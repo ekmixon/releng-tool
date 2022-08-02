@@ -38,10 +38,7 @@ class RelengTool:
         else:
             self.tool = tool
 
-        if exists_args is not None:
-            self.exists_args = exists_args
-        else:
-            self.exists_args = ['--version']
+        self.exists_args = exists_args if exists_args is not None else ['--version']
 
     def execute(self, args=None, cwd=None, quiet=False, env=None, poll=False,
             capture=None):
@@ -70,16 +67,14 @@ class RelengTool:
                 + str(args))
             return False
 
-        final_env = None
-        if self.include or self.sanitize or env:
-            final_env = os.environ.copy()
-            if self.sanitize:
-                for key in self.sanitize:
-                    final_env.pop(key, None)
-            if self.include:
-                final_env.update(self.include)
-            if env:
-                final_env.update(env)
+        final_env = os.environ.copy() if self.include or self.sanitize or env else None
+        if self.sanitize:
+            for key in self.sanitize:
+                final_env.pop(key, None)
+        if self.include:
+            final_env.update(self.include)
+        if env:
+            final_env.update(env)
 
         final_args = [self.tool]
         if args:
@@ -101,10 +96,10 @@ class RelengTool:
             return RelengTool.detected[self.tool]
 
         if execute([self.tool] + self.exists_args, quiet=True, critical=False):
-            debug('{} tool is detected on this system'.format(self.tool))
+            debug(f'{self.tool} tool is detected on this system')
             RelengTool.detected[self.tool] = True
         else:
-            debug('{} tool is not detected on this system'.format(self.tool))
+            debug(f'{self.tool} tool is not detected on this system')
             RelengTool.detected[self.tool] = False
 
         return RelengTool.detected[self.tool]

@@ -52,7 +52,7 @@ def expand(obj, kv=None):
 
         if kv:
             final_kv = dict(os.environ)
-            final_kv.update(kv)
+            final_kv |= kv
         else:
             final_kv = os.environ
 
@@ -92,17 +92,11 @@ def expand(obj, kv=None):
                 rv += c
             idx += 1
     elif isinstance(obj, dict):
-        rv = {}
-        for key, value in obj.items():
-            rv[expand(key)] = expand(value)
+        rv = {expand(key): expand(value) for key, value in obj.items()}
     elif isinstance(obj, list):
-        rv = []
-        for value in obj:
-            rv.append(expand(value))
+        rv = [expand(value) for value in obj]
     elif isinstance(obj, set):
-        rv = set()
-        for value in obj:
-            rv.add(expand(value))
+        rv = {expand(value) for value in obj}
     else:
         rv = obj
 
@@ -127,7 +121,7 @@ def interpret_dictionary_strings(obj):
 
     if isinstance(obj, dict):
         rv = obj
-        for key, value in obj.items():
+        for key, value in rv.items():
             if not isinstance(key, basestring):
                 rv = None
                 break
@@ -151,12 +145,7 @@ def interpret_string(obj):
     Returns:
         the string; otherwise ``None``
     """
-    rv = None
-
-    if isinstance(obj, basestring):
-        rv = obj
-
-    return rv
+    return obj if isinstance(obj, basestring) else None
 
 def interpret_strings(obj):
     """
@@ -181,7 +170,7 @@ def interpret_strings(obj):
             rv = [obj]
         else:
             rv = obj
-            for child in obj:
+            for child in rv:
                 if not isinstance(child, basestring):
                     rv = None
                     break

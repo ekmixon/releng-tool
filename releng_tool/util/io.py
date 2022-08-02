@@ -82,8 +82,8 @@ def ensure_dir_exists(dir_, quiet=False):
     except OSError as e:
         if e.errno != errno.EEXIST:
             if not quiet:
-                err('unable to create directory: ' + dir_)
-                err('    {}'.format(e))
+                err(f'unable to create directory: {dir_}')
+                err(f'    {e}')
             return False
     return True
 
@@ -155,11 +155,7 @@ def execute(args, cwd=None, env=None, env_update=None, quiet=None,
         SystemExit: if the execution operation fails with ``critical=True``
     """
 
-    # append provided environment updates (if any) to the provided or existing
-    # environment dictionary
-    final_env = None
-    if env:
-        final_env = dict(env)
+    final_env = dict(env) if env else None
     if env_update:
         if not final_env:
             final_env = os.environ.copy()
@@ -179,9 +175,9 @@ def execute(args, cwd=None, env=None, env_update=None, quiet=None,
             args = prepend_shebang_interpreter(args)
 
         if is_verbose():
-            debug('(wd) {}'.format(cwd if cwd else os.getcwd()))
+            debug(f'(wd) {cwd or os.getcwd()}')
             cmd_str = _cmd_args_to_str(args)
-            verbose('invoking: ' + cmd_str)
+            verbose(f'invoking: {cmd_str}')
 
         try:
             # check if this execution should poll (for carriage returns and new
@@ -206,7 +202,7 @@ def execute(args, cwd=None, env=None, env_update=None, quiet=None,
                     if not c and proc.poll() is not None:
                         break
                     line += c
-                    if c == b'\r' or c == b'\n':
+                    if c in [b'\r', b'\n']:
                         decoded_line = line.decode('utf_8')
                         if c == b'\n' and capture is not None:
                             capture.append(decoded_line)
@@ -218,11 +214,11 @@ def execute(args, cwd=None, env=None, env_update=None, quiet=None,
                 for line in iter(proc.stdout.readline, ''):
                     if capture is not None or not quiet:
                         line = line.rstrip()
-                        if capture is not None:
-                            capture.append(line)
-                        if not quiet:
-                            print(line)
-                            sys.stdout.flush()
+                    if capture is not None:
+                        capture.append(line)
+                    if not quiet:
+                        print(line)
+                        sys.stdout.flush()
             proc.communicate()
 
             success = (proc.returncode == 0)
@@ -231,8 +227,8 @@ def execute(args, cwd=None, env=None, env_update=None, quiet=None,
                 if not cmd_str:
                     cmd_str = _cmd_args_to_str(args)
 
-                err('unable to execute command: ' + cmd_str)
-                err('    {}'.format(e))
+                err(f'unable to execute command: {cmd_str}')
+                err(f'    {e}')
 
     if not success:
         if args:
@@ -265,7 +261,7 @@ def _cmd_args_to_str(args):
         for arg in args:
             if isinstance(arg, bytes):
                 arg = arg.decode('utf_8')
-            cmd_str += ' ' + quote(arg)
+            cmd_str += f' {quote(arg)}'
         cmd_str = cmd_str.strip()
 
     return cmd_str
@@ -306,8 +302,8 @@ def generate_temp_dir(dir_=None):
             path_remove(dir_)
         except OSError as e:
             if e.errno != errno.ENOENT:
-                warn('unable to cleanup temporary directory: ' + dir_)
-                warn('    {}'.format(e))
+                warn(f'unable to cleanup temporary directory: {dir_}')
+                warn(f'    {e}')
 
 @contextmanager
 def interim_working_dir(dir_):
@@ -348,7 +344,7 @@ def interim_working_dir(dir_):
         try:
             os.chdir(owd)
         except IOError:
-            warn('unable to restore original working directory: ' + owd)
+            warn(f'unable to restore original working directory: {owd}')
 
 def interpret_stem_extension(basename):
     """
@@ -381,12 +377,9 @@ def interpret_stem_extension(basename):
         return (basename, None)
 
     stem, ext = basename.split('.', 1)
-    while '.' in ext:
-        if ext.lower() in MULTIPART_EXTENSIONS:
-            break
-
+    while '.' in ext and ext.lower() not in MULTIPART_EXTENSIONS:
         part, ext = ext.split('.', 1)
-        stem = '{}.{}'.format(stem, part)
+        stem = f'{stem}.{part}'
 
     return (stem, ext)
 
@@ -414,7 +407,7 @@ def opt_file(file):
 
     exists = os.path.isfile(file)
     if not exists:
-        flex_file = file + '.py'
+        flex_file = f'{file}.py'
         if os.path.isfile(flex_file):
             return flex_file, True
 
@@ -484,7 +477,7 @@ def path_copy(src, dst, quiet=False, critical=True):
     except (DistutilsFileError, IOError) as e:
         if not quiet:
             err('unable to copy source contents to target location')
-            err('    {}'.format(e))
+            err(f'    {e}')
 
     if not success and critical:
         sys.exit(-1)
@@ -599,7 +592,7 @@ def path_move(src, dst, quiet=False, critical=True):
             success = False
             if not quiet:
                 err('unable to move source contents to target location')
-                err('    {}'.format(e))
+                err(f'    {e}')
 
     if not success and critical:
         sys.exit(-1)
@@ -694,8 +687,8 @@ def path_remove(path, quiet=False):
     except OSError as e:
         if e.errno != errno.ENOENT:
             if not quiet:
-                err('unable to remove path: ' + path)
-                err('    {}'.format(e))
+                err(f'unable to remove path: {path}')
+                err(f'    {e}')
             return False
 
     return True
@@ -834,13 +827,9 @@ def prepare_definitions(defs, prefix=None):
             if val is None:
                 continue
 
-            if prefix:
-                key = prefix + key
-            else:
-                key = key
-
+            key = prefix + key if prefix else key
             if val:
-                final.append('{}={}'.format(key, val))
+                final.append(f'{key}={val}')
             else:
                 final.append(key)
 
@@ -907,9 +896,8 @@ def run_script(script, globals_, subject=None, catch=True):
             result = run_path(script, init_globals=globals_)
         except Exception as e:
             err(traceback.format_exc())
-            err('error running {}{}script: {}'.format(
-                subject, subject and ' ', script))
-            err('    {}'.format(e))
+            err(f"error running {subject}{subject and ' '}script: {script}")
+            err(f'    {e}')
             return None
 
     return result

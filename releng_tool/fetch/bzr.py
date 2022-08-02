@@ -33,7 +33,7 @@ def fetch(opts):
         err('unable to fetch package; bzr is not installed')
         return None
 
-    note('fetching {}...'.format(name))
+    note(f'fetching {name}...')
     sys.stdout.flush()
 
     cache_dir = os.path.abspath(os.path.join(cache_file, os.pardir))
@@ -41,9 +41,17 @@ def fetch(opts):
         return None
 
     log('exporting sources')
-    if not BZR.execute(['export', cache_file, site,
-            '--format=tgz', '--root=' + name, '--revision=' + revision],
-            poll=True):
+    if not BZR.execute(
+        [
+            'export',
+            cache_file,
+            site,
+            '--format=tgz',
+            f'--root={name}',
+            f'--revision={revision}',
+        ],
+        poll=True,
+    ):
         err('unable to export module')
         return None
 

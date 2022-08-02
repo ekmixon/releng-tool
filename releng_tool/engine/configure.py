@@ -37,11 +37,7 @@ def stage(engine, pkg, script_env):
     if pkg.type == PackageType.PYTHON:
         return True
 
-    if pkg.build_subdir:
-        build_dir = pkg.build_subdir
-    else:
-        build_dir = pkg.build_dir
-
+    build_dir = pkg.build_subdir or pkg.build_dir
     pkg_install_type = NC(pkg.install_type, PackageInstallType.TARGET)
 
     configure_opts = RelengConfigureOptions()

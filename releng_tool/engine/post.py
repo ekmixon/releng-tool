@@ -29,23 +29,19 @@ def stage(engine, pkg, script_env):
         ``True`` if the post-processing stage is completed; ``False`` otherwise
     """
 
-    verbose('post-processing {}...'.format(pkg.name))
+    verbose(f'post-processing {pkg.name}...')
     sys.stdout.flush()
 
-    post_script_filename = '{}-{}'.format(pkg.name, POST_SCRIPT)
+    post_script_filename = f'{pkg.name}-{POST_SCRIPT}'
     post_script = os.path.join(pkg.def_dir, post_script_filename)
     post_script, post_script_exists = opt_file(post_script)
     if not post_script_exists:
         return True
 
-    if pkg.build_subdir:
-        build_dir = pkg.build_subdir
-    else:
-        build_dir = pkg.build_dir
-
+    build_dir = pkg.build_subdir or pkg.build_dir
     with interim_working_dir(build_dir):
         if not run_script(post_script, script_env, subject='post-processing'):
             return False
 
-    verbose('post-processing script executed: ' + post_script)
+    verbose(f'post-processing script executed: {post_script}')
     return True

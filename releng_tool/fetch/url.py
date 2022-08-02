@@ -38,20 +38,17 @@ def fetch(opts):
 
     filename = os.path.basename(cache_file)
 
-    note('fetching {}...'.format(name))
+    note(f'fetching {name}...')
     sys.stdout.flush()
 
-    log('requesting: ' + site)
+    log(f'requesting: {site}')
     try:
         with contextlib.closing(urlopen(site)) as rsp:
             total = 0
             if 'content-length' in rsp.headers:
-                try:
+                with contextlib.suppress(ValueError):
                     total = int(rsp.headers['content-length'])
                     total_str = display_size(total)
-                except ValueError:
-                    pass
-
             read = 0
             with open(cache_file, 'wb') as f:
                 while True:
@@ -67,13 +64,12 @@ def fetch(opts):
                             print('[{:02.0f}%] {}: {} of {}            '.format(
                                 pct, filename, read_str, total_str), end='\r')
                         else:
-                            print(' {}: {}            '.format(
-                                filename, read_str), end='\r')
+                            print(f' {filename}: {read_str}            ', end='\r')
 
                     f.write(buf)
     except Exception as e:
         err('failed to download resource')
-        err('    {}'.format(e))
+        err(f'    {e}')
         return None
 
     log('completed download ({})', display_size(read))

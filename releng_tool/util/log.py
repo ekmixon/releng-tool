@@ -192,7 +192,7 @@ def __log(prefix, color, msg, file, *args):
     msg = str(msg)
     if args:
         msg = msg.format(*args)
-    print('{}{}{}{}'.format(color, prefix, msg, post), file=file)
+    print(f'{color}{prefix}{msg}{post}', file=file)
 
 def releng_log_configuration(debug, nocolor, verbose):
     """

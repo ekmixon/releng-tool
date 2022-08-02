@@ -34,10 +34,10 @@ class ScpTool(RelengTool):
             return RelengTool.detected[self.tool]
 
         if distutils.spawn.find_executable(self.tool):
-            debug('{} tool is detected on this system'.format(self.tool))
+            debug(f'{self.tool} tool is detected on this system')
             RelengTool.detected[self.tool] = True
         else:
-            debug('{} tool is not detected on this system'.format(self.tool))
+            debug(f'{self.tool} tool is not detected on this system')
             RelengTool.detected[self.tool] = False
 
         return RelengTool.detected[self.tool]

@@ -27,7 +27,7 @@ def install(opts):
     def_dir = opts.def_dir
     env = opts.env
 
-    install_script_filename = '{}-{}'.format(opts.name, INSTALL_SCRIPT)
+    install_script_filename = f'{opts.name}-{INSTALL_SCRIPT}'
     install_script = os.path.join(def_dir, install_script_filename)
     install_script, install_script_exists = opt_file(install_script)
     if not install_script_exists:
@@ -36,5 +36,5 @@ def install(opts):
     if not run_script(install_script, env, subject='install'):
         return False
 
-    verbose('install script executed: ' + install_script)
+    verbose(f'install script executed: {install_script}')
     return True

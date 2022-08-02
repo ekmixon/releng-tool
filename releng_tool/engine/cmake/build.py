@@ -30,7 +30,7 @@ def build(opts):
     cmake_defs = {
     }
     if opts.build_defs:
-        cmake_defs.update(expand(opts.build_defs))
+        cmake_defs |= expand(opts.build_defs)
 
     # options
     cmake_opts = {
@@ -38,7 +38,7 @@ def build(opts):
         '--config': 'RelWithDebInfo',
     }
     if opts.build_opts:
-        cmake_opts.update(expand(opts.build_opts))
+        cmake_opts |= expand(opts.build_opts)
 
     # argument building
     cmake_args = [
@@ -52,14 +52,13 @@ def build(opts):
     # enable specific number of parallel jobs is set
     #
     # https://cmake.org/cmake/help/v3.12/manual/cmake.1.html#build-tool-mode
-    if 'releng.cmake.disable_parallel_option' not in opts._quirks:
-        if opts.jobsconf != 1:
-            cmake_args.append('--parallel')
-            if opts.jobsconf > 0:
-                cmake_args.append(str(opts.jobs))
-    else:
+    if 'releng.cmake.disable_parallel_option' in opts._quirks:
         verbose('cmake parallel jobs disabled by quirk')
 
+    elif opts.jobsconf != 1:
+        cmake_args.append('--parallel')
+        if opts.jobsconf > 0:
+            cmake_args.append(str(opts.jobs))
     if not CMAKE.execute(cmake_args, env=expand(opts.build_env)):
         err('failed to build cmake project: {}', opts.name)
         return False

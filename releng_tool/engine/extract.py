@@ -62,7 +62,7 @@ def stage(engine, pkg):
         warn('build directory exists before extraction; removing')
 
         if not path_remove(pkg.build_dir):
-            err('unable to cleanup build directory: ' + pkg.build_dir)
+            err(f'unable to cleanup build directory: {pkg.build_dir}')
             return False
 
     # prepare and step into the a newly created working directory
@@ -109,10 +109,10 @@ def stage(engine, pkg):
                 pass
             elif result == HashResult.BAD_PATH:
                 if not pkg.is_internal:
-                    warn('missing hash file for package: ' + pkg.name)
+                    warn(f'missing hash file for package: {pkg.name}')
             elif result == HashResult.EMPTY:
                 if not pkg.is_internal:
-                    warn('hash file for package is empty: ' + pkg.name)
+                    warn(f'hash file for package is empty: {pkg.name}')
             elif result in (HashResult.BAD_FORMAT, HashResult.MISMATCH,
                     HashResult.MISSING_LISTED, HashResult.UNSUPPORTED):
                 return False

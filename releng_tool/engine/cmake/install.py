@@ -29,7 +29,7 @@ def install(opts):
     cmake_defs = {
     }
     if opts.install_defs:
-        cmake_defs.update(expand(opts.install_defs))
+        cmake_defs |= expand(opts.install_defs)
 
     # default options
     cmake_opts = {
@@ -39,7 +39,7 @@ def install(opts):
         '--target': 'install',
     }
     if opts.install_opts:
-        cmake_opts.update(expand(opts.install_opts))
+        cmake_opts |= expand(opts.install_opts)
 
     # argument building
     cmake_args = [

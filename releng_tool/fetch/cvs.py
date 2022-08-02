@@ -63,9 +63,7 @@ module to checkout. For example:
 
     log('caching sources')
     def cvs_filter(info):
-        if info.name.endswith('CVS'):
-            return None
-        return info
+        return None if info.name.endswith('CVS') else info
 
     cache_dir = os.path.abspath(os.path.join(cache_file, os.pardir))
     if not ensure_dir_exists(cache_dir):

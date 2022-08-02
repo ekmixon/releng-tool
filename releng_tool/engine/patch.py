@@ -39,45 +39,43 @@ def stage(engine, pkg, script_env):
         if engine.opts.devmode and pkg.has_devmode_option:
             return True
 
-    note('patching {}...'.format(pkg.name))
+    note(f'patching {pkg.name}...')
     sys.stdout.flush()
 
-    if pkg.build_subdir:
-        build_dir = pkg.build_subdir
-    else:
-        build_dir = pkg.build_dir
-
-    patch_script_filename = '{}-{}'.format(pkg.name, PATCH_SCRIPT)
+    build_dir = pkg.build_subdir or pkg.build_dir
+    patch_script_filename = f'{pkg.name}-{PATCH_SCRIPT}'
     patch_script = os.path.join(pkg.def_dir, patch_script_filename)
     if os.path.isfile(patch_script):
         try:
             run_path(patch_script, init_globals=script_env)
 
-            verbose('patch script executed: ' + patch_script)
+            verbose(f'patch script executed: {patch_script}')
         except Exception as e:
-            err('error running patch script: ' + patch_script)
-            err('    {}'.format(e))
+            err(f'error running patch script: {patch_script}')
+            err(f'    {e}')
             return False
 
     # find all patches in the package's folder, sort and apply each
     patch_glob = os.path.join(pkg.def_dir, '*.patch')
-    patches = glob(patch_glob)
-    if patches:
+    if patches := glob(patch_glob):
         patches = sorted(patches)
         if not PATCH.exists():
             err('unable to apply patches; patch is not installed')
             return False
 
         for patch in patches:
-            print('({})'.format(os.path.basename(patch)))
+            print(f'({os.path.basename(patch)})')
 
-            if not PATCH.execute([
+            if not PATCH.execute(
+                [
                     '--batch',
                     '--forward',
                     '--ignore-whitespace',
-                    '--input={}'.format(patch),
+                    f'--input={patch}',
                     '--strip=1',
-                    ], cwd=build_dir):
+                ],
+                cwd=build_dir,
+            ):
                 err('failed to apply patch')
                 return False
 

@@ -55,11 +55,12 @@ class PythonTool(RelengTool):
             self._version_cache = version
 
         if sys.platform != 'win32':
-            base_path = os.path.join(sysroot + prefix,
-                'lib', 'python' + self._version_cache)
+            base_path = os.path.join(
+                sysroot + prefix, 'lib', f'python{self._version_cache}'
+            )
+
         else:
-            base_path = os.path.join(sysroot,
-                'Python' + self._version_cache, 'Lib')
+            base_path = os.path.join(sysroot, f'Python{self._version_cache}', 'Lib')
         return os.path.join(base_path, 'site-packages')
 
 #: python host tool helper

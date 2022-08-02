@@ -58,7 +58,7 @@ class RelengPackage:
     """
     def __init__(self, name, version):
         self.name = name
-        self.nv = '{}-{}'.format(name, version)
+        self.nv = f'{name}-{version}'
         self.version = version
         # (commons)
         self.build_dir = None
@@ -105,20 +105,4 @@ class RelengPackage:
         self.python_interpreter = None
 
     def __str__(self):
-        return (
-            'package "{}"\n'
-            '      build: {}\n'
-            '  build-out: {}\n'
-            ' definition: {}\n'
-            '       site: {}\n'
-            '   vcs-type: {}\n'
-            '    version: {}'
-            ).format(
-                self.name,
-                self.build_dir,
-                self.build_output_dir,
-                self.def_dir,
-                self.site,
-                self.vcs_type,
-                self.version,
-                )
+        return f'package "{self.name}"\n      build: {self.build_dir}\n  build-out: {self.build_output_dir}\n definition: {self.def_dir}\n       site: {self.site}\n   vcs-type: {self.vcs_type}\n    version: {self.version}'
